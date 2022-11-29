@@ -1,32 +1,12 @@
-# Prerequisites
-*.d
+build/
+build64/
+output/
+src/CustomerPrintClientGui/Generated/
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+.vscode/
 
-# Precompiled Headers
-*.gch
-*.pch
+**/wxMSW/lib/**/*d.lib
+**/wxMSW/lib/**/*d_*.lib
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
+*.pdb
+*.aps

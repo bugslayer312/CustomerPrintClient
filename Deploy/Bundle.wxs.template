@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:bal="http://schemas.microsoft.com/wix/BalExtension"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+  <Bundle Version="@PRODUCT_VERSION@" Name="@PRODUCT@ Suite @PRODUCT_DISPLAY_VERSION@"
+          Manufacturer="BugSlayer Inc."
+          UpgradeCode="6BC9559D-F9C5-4A69-97D4-DFC28101F303"
+          DisableModify="yes">
+    <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLargeLicense">
+      <bal:WixStandardBootstrapperApplication
+        LicenseFile="res\License.rtf"
+        SuppressOptionsUI="yes"
+        LogoFile="res\bootstrapper-icon.png"
+        ThemeFile="res\WixBootstrapperTheme.xml"
+        LaunchTarget="[ProgramFiles6432Folder]@PRODUCT@\RemotePrint.exe"
+        LaunchWorkingFolder="[ProgramFiles6432Folder]@PRODUCT@"
+        ShowFilesInUse="yes" />
+    </BootstrapperApplicationRef>
+
+    <bal:Condition Message="This application is only supported on Windows 7 or higher.">
+      <![CDATA[VersionNT >= v6.1]]>
+    </bal:Condition>
+
+    <Variable Name="BundleUninstallKey_x64" Value="SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\[WixBundleProviderKey]"/>
+    <Variable Name="BundleUninstallKey_x86" Value="SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\[WixBundleProviderKey]"/>
+
+    <Chain>
+      <MsiPackage SourceFile="Output\@PRODUCT@64.msi"
+                  InstallCondition="VersionNT64"
+                  DisplayInternalUI="yes"
+                  EnableFeatureSelection="yes"
+                  Visible="yes">
+        <MsiProperty Name="BUNDLE_UNINSTALL_KEY" Value="[BundleUninstallKey_x64]"/>
+        <MsiProperty Name="RUN_FROM_BUNDLE" Value="1"/>
+      </MsiPackage>
+      <MsiPackage SourceFile="Output\@PRODUCT@32.msi"
+                  InstallCondition="NOT VersionNT64"
+                  DisplayInternalUI="yes"
+                  EnableFeatureSelection="yes"
+                  Visible="yes">
+        <MsiProperty Name="BUNDLE_UNINSTALL_KEY" Value="[BundleUninstallKey_x86]"/>
+        <MsiProperty Name="RUN_FROM_BUNDLE" Value="1"/>
+      </MsiPackage>
+	</Chain>
+  </Bundle>
+</Wix>

@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+
+  <Product Version="@PRODUCT_VERSION@" Name="@PRODUCT@ @PRODUCT_DISPLAY_VERSION@"
+           Id="*" Manufacturer="BugSlayer Inc." Language="1033"
+           UpgradeCode="53FA3423-16C9-4B96-8E9A-46B68D961995">
+
+    <Package Description="@PRODUCT@ Installation package"
+             Comments="@PRODUCT@ application."
+             Manufacturer="BugSlayer Inc."
+             Platform="@PLATFORM@" InstallerVersion="301" InstallPrivileges="elevated" Compressed="yes"/>
+
+    <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+
+      <!-- Program Files -->
+      <Directory Id="@PROGRAM_FILES_FOLDER@">
+        <Directory Id="INSTALLLOCATION" Name="@PRODUCT@">
+          <Component Id="RemotePrint.exe" Guid="5F08106D-481C-463E-975D-5F6C227045F3">
+            <File Id="RemotePrint.exe" Name="RemotePrint.exe" Source="..\output\@PLATFORM@\@CONFIGURATION@\bin\RemotePrint.exe" KeyPath="yes"/>
+          </Component>
+          <Component Id="pdfium.dll" Guid="FBA02284-7126-4698-9823-84C7DDD6F37F">
+            <File Id="pdfium.dll" Name="pdfium.dll" Source="..\output\@PLATFORM@\@CONFIGURATION@\bin\pdfium.dll" />
+          </Component>
+          @LIB_CRYPTO_COMMENT_BEGIN@
+          <Component Id="libcrypto.dll" Guid="3723F5AE-69C9-443C-B38C-F598B48C049E">
+            <File Id="libcrypto.dll" Name="@LIB_CRYPTO@" Source="..\output\@PLATFORM@\@CONFIGURATION@\bin\@LIB_CRYPTO@" />
+          </Component>
+          @LIB_CRYPTO_COMMENT_END@
+        </Directory>
+      </Directory>
+
+      <!-- All Users\Application Data -->
+      <Directory Id="CommonAppDataFolder">
+        <Directory Id="ProgramSettingsFolder" Name="@PRODUCT@">
+
+          <Component Id="ProgramSettingsComponent" Guid="0F8318AF-C85D-403A-97ED-21D682D35732">
+            <CreateFolder Directory="ProgramSettingsFolder">
+              <Permission User="Everyone" GenericAll="yes" />
+            </CreateFolder>
+          </Component>
+
+        </Directory>
+	  </Directory>
+
+      <!-- Shortcuts -->
+      <Directory Id="ProgramMenuFolder" Name="Programs">
+        <Directory Id="ApplicationProgramsFolder" Name="@PRODUCT@">
+          <Component Id="ApplicationShortcut" Guid="F6F08FCD-2D44-44FD-9030-023F1D982A61">
+            <Shortcut Id="ApplicationStartMenuShortcut" Name="@PRODUCT@"
+		          Target="[INSTALLLOCATION]RemotePrint.exe" WorkingDirectory="INSTALLLOCATION"/>
+            <Shortcut Id="UninstallProduct" Name="Uninstall @PRODUCT@"
+							Target="[UninstallTarget]" Arguments="[UninstallArguments]"/>
+            <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall"/>
+			<RegistryValue Root="HKCU" Key="Software\@PRODUCT@" Name="installed" Type="integer"
+							Value="1" KeyPath="yes"/>
+          </Component>
+        </Directory>
+      </Directory>
+
+      <!-- Registry -->
+      <Component Id="RegistryEntries" Guid="34C6634D-4566-4EEE-9216-78592E9FF805">
+        <RegistryKey Root="HKCU" Key="Software\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION">
+          <RegistryValue Type="integer" Name="RemotePrint.exe" Value="11000"/>
+        </RegistryKey>
+      </Component>
+
+    </Directory>
+
+    <DirectoryRef Id="TARGETDIR">
+      <Merge Id="Microsoft_VC142_CRT_@PLATFORM@" SourceFile="Prerequisites\Microsoft_VC142_CRT_@PLATFORM@.msm" DiskId="1" Language="0"/>
+    </DirectoryRef>
+
+    <Feature Id="VCRedist" Title="Microsoft Visual C++ Redistributable 2019" AllowAdvertise="no" Display="hidden" Level="1">
+      <MergeRef Id="Microsoft_VC142_CRT_@PLATFORM@"/>
+    </Feature>
+
+    <!-- Features -->
+    <Feature Id="ConsoleFeature" Title="@PRODUCT@ program files" Absent="disallow" AllowAdvertise="no" Level="1"
+             ConfigurableDirectory="INSTALLLOCATION"
+             Description="@PRODUCT@ files, shortcuts and registry entries (required)">
+      <ComponentRef Id="RemotePrint.exe" />
+      <ComponentRef Id="pdfium.dll" />
+      @LIB_CRYPTO_COMMENT_BEGIN@
+      <ComponentRef Id="libcrypto.dll" />
+      @LIB_CRYPTO_COMMENT_END@
+      <ComponentRef Id="ApplicationShortcut" />
+      <ComponentRef Id="RegistryEntries" />
+	  <ComponentRef Id="ProgramSettingsComponent" />
+    </Feature>
+
+    <CustomAction Id="SetUninstallTargetProduct" Property="UninstallTarget" Value="[System64Folder]msiexec.exe" />
+    <CustomAction Id="SetUninstallTargetBundle" Property="UninstallTarget" Value="[BUNDLE_CACHE_PATH]" />
+    <CustomAction Id="SetUninstallArgumentsProduct" Property="UninstallArguments" Value="/x [ProductCode]" />
+    <CustomAction Id="SetUninstallArgumentsBundle" Property="UninstallArguments" Value="/uninstall" />
+    <CustomAction Id="SetExitOptionalCheckBox" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
+    <CustomAction Id="SetExitOptionalCheckBoxText" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Start @PRODUCT@" />
+    <CustomAction Id="LaunchApplication" Directory="INSTALLLOCATION" ExeCommand="explorer RemotePrint.exe" Impersonate="yes" Execute="immediate" Return="asyncWait"/>
+
+    <InstallUISequence>
+      <Custom Action="SetExitOptionalCheckBox" After="LaunchConditions">NOT RUN_FROM_BUNDLE</Custom>
+      <Custom Action="SetExitOptionalCheckBoxText" After="LaunchConditions">NOT RUN_FROM_BUNDLE</Custom>
+    </InstallUISequence>
+    
+    <InstallExecuteSequence>
+      <RemoveExistingProducts Before="InstallInitialize"/>
+      <Custom Action="SetUninstallTargetBundle" After="InstallInitialize">
+        NOT Installed AND NOT REMOVE AND BUNDLE_CACHE_PATH
+      </Custom>
+      <Custom Action="SetUninstallArgumentsBundle" After="SetUninstallTargetBundle">
+        NOT Installed AND NOT REMOVE AND BUNDLE_CACHE_PATH
+      </Custom>
+      <Custom Action="SetUninstallTargetProduct" After="SetUninstallTargetBundle">
+        NOT Installed AND NOT REMOVE AND NOT BUNDLE_CACHE_PATH
+      </Custom>
+      <Custom Action="SetUninstallArgumentsProduct" After="SetUninstallTargetProduct">
+        NOT Installed AND NOT REMOVE AND NOT BUNDLE_CACHE_PATH
+      </Custom>
+    </InstallExecuteSequence>
+
+    <!-- Conditions -->
+    <Condition Message="@OS_CONDITION_MESSAGE@">
+      @OS_CONDITION@
+    </Condition>
+    <Condition Message="You must be an administrator to install this product.">
+      Privileged
+    </Condition>
+
+    <Property Id="ALLUSERS">1</Property>
+    <Property Id="BUNDLE_CACHE_PATH">
+      <RegistrySearch Id="BundleExeRegSearch"
+                      Root="HKLM"
+                      Key="[BUNDLE_UNINSTALL_KEY]"
+                      Name="BundleCachePath"
+                      Type="file">
+        <FileSearch Id="BundleExeFileSearch" Name="[BUNDLE_CACHE_PATH]"/>
+      </RegistrySearch>
+    </Property>
+
+    <!-- User interface -->
+    <WixVariable Id="WixUILicenseRtf" Value="res\License.rtf" />
+    <!-- <WixVariable Id="WixUIBannerBmp" Value="res\@BANNER_FILE@" /> -->
+    <!-- <WixVariable Id="WixUIDialogBmp" Value="res\@DIALOG_FILE@" /> -->
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLLOCATION" />
+
+    <UI>
+      <UIRef Id="WixUI_CustomFeatureTree" />
+      <Publish Dialog="ExitDialog" Control="Finish" Event="DoAction" Value="LaunchApplication">
+        WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 AND NOT Installed
+      </Publish>
+    </UI>
+
+    <!-- Upgrade -->
+    <Property Id="OLDERFOUND" Secure="yes" />
+    <Upgrade Id="53FA3423-16C9-4B96-8E9A-46B68D961995">
+      <UpgradeVersion Maximum="@PRODUCT_VERSION@" Minimum="0.1.0.0" IncludeMinimum="yes" IncludeMaximum="no" Property="OLDERFOUND"/>
+    </Upgrade>
+
+  </Product>
+</Wix>

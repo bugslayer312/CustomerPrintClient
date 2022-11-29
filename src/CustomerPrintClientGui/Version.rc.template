@@ -1,0 +1,37 @@
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO     VERSIONINFO
+  FILEVERSION       @BUILD_VERSION@
+  PRODUCTVERSION    @BUILD_VERSION@
+ FILEFLAGSMASK VS_FFI_FILEFLAGSMASK
+#ifdef _DEBUG
+ FILEFLAGS VS_FF_DEBUG
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS VOS_NT_WINDOWS32
+ FILETYPE VFT_APP
+ FILESUBTYPE VFT2_UNKNOWN
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "CompanyName", "BugSlayer Inc."
+            VALUE "FileDescription", "RemotePrint client application"
+            VALUE "FileVersion",     "@BUILD_VERSION@"
+            VALUE "InternalName",    "RemotePrint.exe"
+            VALUE "LegalCopyright", "(c) BugSlayer Inc. All rights reserved."
+            VALUE "OriginalFilename","RemotePrint.exe"
+            VALUE "ProductName", "RemotePrint"
+            VALUE "ProductVersion",  "@BUILD_VERSION@"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0409, 1200
+    END
+END

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 352 352" xmlns="http://www.w3.org/2000/svg">
+  <title>ionicons-v5-j</title>
+  <path d="M 16 96 L 16 56 C 16 33.909 35.898 16 60.444 16 L 291.556 16 C 316.101 16 336 33.909 336 56 L 336 296 C 336 318.091 316.101 336 291.556 336 L 60.444 336 C 35.898 336 16 318.091 16 296 L 16 256" style="fill:none;stroke:#000;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/>
+  <polyline points="150.734 256 230.734 176 150.734 96" style="fill:none;stroke:#000;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/>
+  <line x1="-27.753" y1="215.684" x2="186.247" y2="215.684" style="fill:none;stroke:#000;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px" transform="matrix(1, 0, 0, 1, 43.752776, -39.683564)"/>
+</svg>

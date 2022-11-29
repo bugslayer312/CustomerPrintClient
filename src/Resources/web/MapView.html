@@ -1,0 +1,162 @@
+﻿<html>
+<head>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+        body {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <script type="text/javascript">
+        const API_KEY = "XxXxXxXxXx_YyYyYyYyYy";
+        const ICON_MAILGATE = 'memory:office-marker-mail.png';
+        const ICON_PRINTER = 'memory:office-marker-normal.png';
+        const ICON_SELECTED = 'memory:office-marker-selected.png';
+        var map;
+        var zoom = 12;
+        var markers = [];
+        var selectedMarker;
+
+        function invokeExternEvent(_params) {
+            _params.id = Date.now();
+            document.title = JSON.stringify(_params);
+        }
+        function doGetViewPort() {
+            return {
+                lat: map.getCenter().lat(),
+                lng: map.getCenter().lng(),
+                radius: google.maps.geometry.spherical.computeDistanceBetween(
+                    map.getBounds().getSouthWest(), map.getBounds().getNorthEast())/2
+            };
+        }
+        function getViewPort() {
+            return JSON.stringify(doGetViewPort());
+        }
+        function viewPortChanged() {
+            invokeExternEvent({
+                event: "ViewPortChanged",
+                params: doGetViewPort()
+            });
+        }
+        function createMap(lat, lng, _zoom) {
+            zoom = _zoom;
+            map = new google.maps.Map(document.getElementById("map"),
+                {
+                    center: new google.maps.LatLng(lat, lng),
+                    zoom: zoom,
+                    mapTypeControl: false,
+                    fullscreenControl: false,
+                    streetViewControl: false
+                }
+            );
+            map.addListener('zoom_changed', function () {
+                var _isZoomOut = map.zoom < zoom;
+                zoom = map.zoom;
+                if (_isZoomOut) {
+                    viewPortChanged();
+                }
+            });
+            map.addListener('dragend', function () {
+                viewPortChanged();
+            });
+            google.maps.event.addListenerOnce(map, 'idle', function () {
+                invokeExternEvent({
+                    event: "MapCreated",
+                    params: {
+                        result: true
+                    }
+                });
+            });
+        }
+        function placeOffices(offices) {
+            for (var i = 0; i < offices.length; ++i) {
+                var _office = offices[i];
+                var marker = new google.maps.Marker({
+                    position: new google.maps.LatLng(_office.Lat, _office.Lng),
+                    scaledSize: new window.google.maps.Size(150, 150),
+                    title: _office.Name,
+                    icon: _office.Mailgate ? ICON_MAILGATE : ICON_PRINTER
+                });
+                marker.ouid = _office.Id;
+                marker.mailgate = _office.Mailgate;
+                marker.addListener('click', function () {
+                    invokeExternEvent({
+                        event: "MarkerClick",
+                        params: {
+                            ouid: this.ouid
+                        }
+                    });
+                });
+                markers.push(marker);
+                marker.setMap(map);
+            }
+        }
+        
+        function selectOffice(office) {
+            if (selectedMarker) {
+                if (selectedMarker.ouid == office.Id) {
+                    return;
+                }
+                selectedMarker.setIcon(selectedMarker.Mailgate ? ICON_MAILGATE : ICON_PRINTER);
+                selectedMarker = null;
+            }
+            if (office.Id) {
+                var found = markers.find(function (marker) { return marker.ouid == office.Id; });
+                if (found) {
+                    found.setIcon(ICON_SELECTED);
+                    selectedMarker = found;
+                    if (office.CenterView) {
+                        map.setCenter(selectedMarker.position);
+                    }
+                }
+            }
+        }
+        function onMapSourceLoaded() {
+            var _req = new XMLHttpRequest();
+            _req.open('POST', 'https://www.googleapis.com/geolocation/v1/geolocate?key=' + API_KEY);
+            _req.send();
+            _req.onload = function() {
+                var _error;
+                if (_req.status == 200) {
+                    const _coord = JSON.parse(_req.response);
+                    if (_coord && _coord.location) {
+                        createMap(_coord.location.lat, _coord.location.lng, zoom);
+                        return;
+                    }
+                    _error = "Geolocation request error: failed to parse response";
+                }
+                _error = "Geolocation request error. Response: " + _req.status + "(" + _req.statusText + ")";
+                invokeExternEvent({
+                    event: "MapCreated",
+                    params: {
+                        result: false,
+                        error: _error
+                    }
+                });
+            }
+            _req.onerror = function() {
+                invokeExternEvent({
+                    event: "MapCreated",
+                    params: {
+                        result: false,
+                        error: "Geolocation request failed"
+                    }
+                });
+            }
+        }
+    </script>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=XxXxXxXxXx_YyYyYyYyYy&callback=onMapSourceLoaded&libraries=geometry"></script>
+</body>
+</html>

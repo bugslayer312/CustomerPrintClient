@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="100px" height="100px" viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 58 (84663) - https://sketch.com -->
+    <title>icon-v2-logotype</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <rect id="path-1" x="0" y="0" width="100" height="100" rx="15"></rect>
+        <radialGradient cx="-6.63287973%" cy="106.571629%" fx="-6.63287973%" fy="106.571629%" r="148.042677%" gradientTransform="translate(-0.066329,1.065716),scale(1.000000,0.999800),rotate(-40.121078),scale(1.000000,0.885847),translate(0.066329,-1.065716)" id="radialGradient-3">
+            <stop stop-color="#7286AA" offset="0%"></stop>
+            <stop stop-color="#45546C" offset="100%"></stop>
+        </radialGradient>
+    </defs>
+    <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="icon-v2-logotype">
+            <g id="Group-3">
+                <mask id="mask-2" fill="white">
+                    <use xlink:href="#path-1"></use>
+                </mask>
+                <g id="Clip-2"></g>
+                <polygon id="Fill-1" fill="url(#radialGradient-3)" mask="url(#mask-2)" points="0.06 100 100 100 100 0.04 0.06 0.04"></polygon>
+            </g>
+            <path d="M33.482,29.991 L52.801,24.815 C61.603,22.456 70.65,27.68 73.009,36.482 L78.186,55.801 C80.544,64.602 75.32,73.65 66.518,76.009 L47.199,81.186 C38.398,83.544 29.35,78.32 26.991,69.518 L21.815,50.199 C19.456,41.397 24.68,32.35 33.482,29.991 Z M34.258,32.889 C27.057,34.819 22.783,42.221 24.712,49.423 L29.889,68.741 C31.819,75.943 39.221,80.217 46.423,78.287 L65.741,73.111 C72.943,71.182 77.217,63.778 75.287,56.577 L70.111,37.258 C68.182,30.057 60.778,25.783 53.577,27.712 L34.258,32.889 L34.258,32.889 Z" id="Fill-4" fill="#FFFFFE"></path>
+            <path d="M30,22 C35.523,22 40,26.477 40,32 C40,37.523 35.523,42 30,42 C24.477,42 20,37.523 20,32 C20,26.477 24.477,22 30,22" id="Fill-5" fill="#E46D2A"></path>
+        </g>
+    </g>
+</svg>
